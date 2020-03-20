@@ -34,3 +34,73 @@
 .bounceInRight {
   animation-name: bounceInRight;
 }
+
+@keyframes showBounce {
+  0% {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translate3d(110%, 0, 0);
+  }
+  100% {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.showBounce {
+  animation-name: showBounce;
+}
+
+@keyframes hiddenBounce {
+  0% {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translate3d(110%, 0, 0);
+  }
+}
+
+.hiddenBounce {
+  animation-name: hiddenBounce;
+}
+
+.hide {
+  display: none !important;
+}
+
+@keyframes showMenuMask {
+  0%, 100% {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.showMenuMask {
+  animation-name: showMenuMask;
+}
+
+@keyframes hiddenMenuMask {
+  0%, 100% {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
+.hiddenMenuMask {
+  animation-name: hiddenMenuMask;
+}
