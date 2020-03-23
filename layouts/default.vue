@@ -75,8 +75,8 @@
           ></a>
         </div>
         <div class="nav">
-          <a href="/" class="current">首页</a>
-          <a href="/">归档</a>
+          <nuxt-link to="/">首页</nuxt-link>
+          <nuxt-link to="/archives">归档</nuxt-link>
           <a class="search" @click="operateShowSearch"
             ><span class="fa fa-search"></span
           ></a>
@@ -90,9 +90,9 @@
       </div>
     </aside>
     <div class="container">
-      <main class="animated bounceInRight">
+      <div class="main animated bounceInRight">
         <nuxt />
-      </main>
+      </div>
     </div>
   </div>
 </template>
@@ -105,7 +105,7 @@
   width: 100%;
   position: absolute;
   box-sizing: border-box;
-  main {
+  .main {
     max-width: 700px;
     display: flex;
     flex-direction: column;

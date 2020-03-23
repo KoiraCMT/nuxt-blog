@@ -105,8 +105,8 @@ export default class extends Vue {
   }
 
   mounted() {
-    const page = (this.$route as Route).query.page as string
-    this.pagination.currentPage = parseInt(page)
+    this.pagination.currentPage =
+      this.$route.query.page !== undefined ? Number(this.$route.query.page) : 1
   }
 }
 </script>

@@ -1,186 +1,128 @@
 <template>
-  <div class="m-pagesBox">
+  <div class="paginator">
     <nuxt-link
-      class="prev"
-      :disabled="currentPage <= 1"
-      tag="button"
-      :to="{ path: '/', query: { page: currentPage - 1 } }"
+      v-for="(item, index) in pages"
+      :key="index"
+      class="page"
+      :class="{ active: item === currentPage }"
+      :to="formatUrl(item)"
+      @click="select(item)"
     >
-      <i class="iconfont myhr-backward"></i>
-    </nuxt-link>
-    <div v-if="count <= 11" class="pages">
-      <nuxt-link
-        v-for="item in count"
-        :key="item"
-        :class="currentPage === item ? 'active' : ''"
-        :to="{ path: '/', query: { page: item } }"
-        >{{ item }}</nuxt-link
-      >
-    </div>
-    <div v-else class="pages">
-      <template v-if="currentPage <= 6">
-        <nuxt-link
-          v-for="item in 10"
-          :key="item"
-          :class="currentPage === item ? 'active' : ''"
-          :to="{ path: '/', query: { page: item } }"
-          >{{ item }}</nuxt-link
-        >
-        <nuxt-link
-          :to="{
-            path: '/',
-            query: {
-              page: currentPage + 9 > count ? count : currentPage + 9
-            }
-          }"
-          >...</nuxt-link
-        >
-        <nuxt-link
-          v-if="count > 11"
-          :to="{ path: '/', query: { page: count } }"
-          >{{ count }}</nuxt-link
-        >
-      </template>
-      <template v-else>
-        <nuxt-link :to="{ path: '/', query: { page: '1' } }">1</nuxt-link>
-        <nuxt-link
-          :to="{
-            path: '/',
-            query: {
-              page: currentPage - 9 < 1 ? 1 : currentPage - 9
-            }
-          }"
-          >...</nuxt-link
-        >
-        <template v-if="currentPage + 5 < count">
-          <nuxt-link
-            v-for="item in getArr(currentPage - 4, currentPage)"
-            :key="item"
-            :to="{ path: '/', query: { page: item } }"
-            >{{ item }}</nuxt-link
-          >
-          <nuxt-link
-            v-for="item in getArr(currentPage + 1, currentPage + 4)"
-            :key="item"
-            :class="currentPage === item ? 'active' : ''"
-            :to="{ path: '/', query: { page: item } }"
-            >{{ item }}</nuxt-link
-          >
-          <nuxt-link
-            :to="{
-              path: '/',
-              query: {
-                page: currentPage + 9 > count ? count : currentPage + 9
-              }
-            }"
-            >...</nuxt-link
-          >
-          <nuxt-link :to="{ path: '/', query: { page: count } }">{{
-            count
-          }}</nuxt-link>
-        </template>
-        <template v-else>
-          <nuxt-link
-            v-for="item in getArr(count - 9, count)"
-            :key="item"
-            :class="currentPage === item ? 'active' : ''"
-            :to="{ path: '/', query: { page: item } }"
-            >{{ item }}</nuxt-link
-          >
-        </template>
-      </template>
-    </div>
-    <nuxt-link
-      class="next"
-      :disabled="currentPage === count"
-      tag="button"
-      :to="{ path: '/', query: { page: currentPage + 1 } }"
-    >
-      <i class="iconfont myhr-forward"></i>
+      {{ item }}
     </nuxt-link>
   </div>
 </template>
-<script lang="ts">
-import Vue from 'vue'
-export default Vue.extend({
-  name: 'Pagination',
+<script>
+import { filterEmpty, serialize } from '../utils/helper'
+export default {
   props: {
+    // 分页的总数
+    total: {
+      type: Number,
+      default: 100
+    },
     pageSize: {
       type: Number,
-      default: 10
-    },
-    currentPage: {
-      type: Number,
-      default: 1
-    },
-    total: {
-      type: Number
+      default: 24
+    }
+  },
+  data() {
+    return {
+      currentPage: 1,
+      totalPages: 1
     }
   },
   computed: {
-    count() {
-      return Math.ceil(this.total / this.pageSize)
+    pages() {
+      const c = this.currentPage
+      const t = this.totalPages
+      if (t === 1) {
+        return []
+      } else if (t < 9) {
+        const pages = []
+        for (let i = 1; i <= t; ++i) {
+          pages.push(i)
+        }
+        return pages
+      } else if (t > 9) {
+        if (c <= 5) {
+          return [1, 2, 3, 4, 5, 6, 7, 8, 9, '...', t]
+        } else if (c >= t - 4) {
+          return [
+            1,
+            '...',
+            t - 8,
+            t - 7,
+            t - 6,
+            t - 5,
+            t - 4,
+            t - 3,
+            t - 2,
+            t - 1,
+            t
+          ]
+        } else {
+          return [
+            1,
+            '...',
+            c - 3,
+            c - 2,
+            c - 1,
+            c,
+            c + 1,
+            c + 2,
+            c + 3,
+            '...',
+            t
+          ]
+        }
+      }
+      return []
     }
   },
+  mounted() {
+    this.totalPages = Math.max(1, Math.ceil(this.total / this.pageSize))
+    this.currentPage = this.$route.query.page
+      ? parseInt(this.$route.query.page)
+      : 1
+  },
   methods: {
-    getArr(firstNum: number, lastNum: number) {
-      const arr = []
-      for (let i = firstNum; i <= lastNum; i++) {
-        arr.push(i)
-      }
-      return arr
+    formatUrl(page) {
+      const query = filterEmpty(this.$route.query)
+      query.page = page
+      return this.$route.path + '?' + serialize(query)
+    },
+    select(n) {
+      if (n === this.currentPage) return
+      if (typeof n === 'string') return
+      this.currentPage = n
     }
   }
-})
-</script>
-
-<style lang="less" scoped>
-@textColor: #963fb1;
-@fontSize: 13px;
-#btnStyle() {
-  display: inline-block;
-  min-width: 35.5px;
-  height: 28px;
-  line-height: 28px;
-  background: #fff;
-  border: none;
-  color: #303133;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
 }
-.m-pagesBox {
-  .prev,
-  .next {
-    outline: none;
-    padding: 0 6px;
-    #btnStyle;
-    i {
-      font-size: 12px;
-    }
-    &:hover {
-      cursor: pointer;
-      color: @textColor;
-    }
-    &:disabled {
-      color: #c0c4cc;
-      cursor: not-allowed;
-    }
-  }
-  .pages {
-    display: inline-block;
-    a {
-      margin: 0;
-      padding: 0 4px;
-      font-size: @fontSize;
-      text-align: center;
-      font-weight: bold;
-      #btnStyle;
-      &:hover,
-      &.active {
-        cursor: pointer;
-        color: @textColor;
-      }
+</script>
+<style scoped lang="less">
+.paginator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0.3rem;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    border-color: #4373dc;
+    color: #0c0907;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s;
+    background-color: #f7f7f7;
+    &.active {
+      background-color: #4373dc;
+      color: white;
+      border-color: #4373dc;
     }
   }
 }
